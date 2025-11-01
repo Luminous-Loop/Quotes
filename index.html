@@ -459,11 +459,11 @@
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>ELOHIMS</h1>
+       <header>
+            <img id="headerLogo" src="logo.png" alt="ELOHIMS" class="header-logo" onerror="this.style.display='none'; document.getElementById('headerTitle').style.display='block';">
+            <h1 id="headerTitle" style="display: none;">ELOHIMS</h1>
             <p>Quote Generator — Mobile Edition</p>
         </header>
-
         <div class="install-prompt" id="installPrompt">
             📱 Tap here to install app for offline use
         </div>
@@ -474,6 +474,7 @@
                 <div class="upload-box" id="uploadBox">
                     <input type="file" id="bgInput" accept="image/*">
                     <div class="upload-content" id="uploadContent">
+                        <img id="uploadLogoImg" alt="ELOHIMS Logo" style="width: 50px; height: 50px; opacity: 0.4; margin-bottom: 8px;">
                         <p style="font-weight: 600; margin-bottom: 5px;">Tap to Upload Background</p>
                         <p style="font-size: 0.8em; color: #666;">PNG or JPG</p>
                     </div>
@@ -507,7 +508,8 @@
                             <div class="quote-box" id="quoteBox">
                                 <div class="quote-text" id="quoteText"></div>
                             </div>
-                            <div class="placeholder-overlay" id="placeholderOverlay">
+                         <div class="placeholder-overlay" id="placeholderOverlay">
+                                <img id="placeholderLogoImg" alt="ELOHIMS Logo" style="width: 100px; height: 100px; opacity: 0.3; margin-bottom: 10px;">
                                 <p style="font-weight: 600; margin-bottom: 8px; font-size: 1.1em;">📸 Upload & Create</p>
                                 <p style="font-size: 0.9em;">Add background and quotes to start</p>
                             </div>
@@ -521,7 +523,7 @@
                 </div>
             </div>
 
-            <div class="section">
+           <div class="section">
                 <div class="collapsible-header" onclick="toggleSection('boxControls')">
                     <h3 class="section-title" style="margin: 0; border: none; padding: 0;">🎨 Box Style</h3>
                     <span class="toggle-icon" id="boxControlsIcon">▼</span>
@@ -551,12 +553,21 @@
                         <label>Border: <span id="borderWidthValue">3px</span></label>
                         <input type="range" id="borderWidth" min="0" max="10" value="3">
                     </div>
-                    <div class="control-group">
+                  <div class="control-group">
                         <label>Corners: <span id="cornerRadiusValue">25px</span></label>
                         <input type="range" id="cornerRadius" min="0" max="50" value="25">
                     </div>
+                    <div class="control-group">
+                        <label>Horizontal: <span id="boxHPosValue">50%</span></label>
+                        <input type="range" id="boxHPos" min="0" max="100" value="50">
+                    </div>
+                    <div class="control-group">
+                        <label>Vertical: <span id="boxVPosValue">50%</span></label>
+                        <input type="range" id="boxVPos" min="0" max="100" value="50">
+                    </div>
                 </div>
             </div>
+          
 
             <div class="section">
                 <div class="collapsible-header" onclick="toggleSection('textControls')">
@@ -628,6 +639,15 @@
     </div>
 
     <script>
+        // Set logo images on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const logoSrc = 'logo.png';
+            const uploadLogo = document.getElementById('uploadLogoImg');
+            const placeholderLogo = document.getElementById('placeholderLogoImg');
+            
+            if (uploadLogo) uploadLogo.src = logoSrc;
+            if (placeholderLogo) placeholderLogo.src = logoSrc;
+        });
         // PWA Service Worker Registration
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -713,7 +733,8 @@
         let backgroundImage = null, quotes = [], currentQuoteIndex = 0;
         
         const defaultSettings = {
-            boxWidth: 70, boxHeight: 35, boxBgColor: '#ffffff', boxOpacity: 95,
+            boxWidth: 70, boxHeight: 35, boxHPos: 50, boxVPos: 50,
+            boxBgColor: '#ffffff', boxOpacity: 95,
             borderColor: '#8B0000', borderWidth: 3, cornerRadius: 25,
             fontFamily: 'Arial, sans-serif', fontSize: 42, fontColor: '#1a1a1a',
             fontWeight: 600, lineHeight: 1.6, textAlign: 'center'
@@ -798,6 +819,10 @@
         });
 
         function applySettings() {
+            $('boxHPos').value = settings.boxHPos;
+            $('boxHPosValue').textContent = settings.boxHPos + '%';
+            $('boxVPos').value = settings.boxVPos;
+            $('boxVPosValue').textContent = settings.boxVPos + '%';
             $('boxWidth').value = settings.boxWidth;
             $('boxWidthValue').textContent = settings.boxWidth + '%';
             $('boxHeight').value = settings.boxHeight;
@@ -833,6 +858,18 @@
             updatePreview();
         };
 
+        $('boxHPos').oninput = e => {
+            settings.boxHPos = e.target.value;
+            $('boxHPosValue').textContent = e.target.value + '%';
+            updatePreview();
+        };
+
+        $('boxVPos').oninput = e => {
+            settings.boxVPos = e.target.value;
+            $('boxVPosValue').textContent = e.target.value + '%';
+            updatePreview();
+        };
+        
         $('boxBgColor').oninput = e => {
             settings.boxBgColor = e.target.value;
             updatePreview();
@@ -952,6 +989,8 @@
             box.style.background = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity})`;
             box.style.border = `${settings.borderWidth}px solid ${settings.borderColor}`;
             box.style.borderRadius = settings.cornerRadius + 'px';
+            box.style.left = settings.boxHPos + '%';
+            box.style.top = settings.boxVPos + '%';
             
             const text = $('quoteText');
             text.style.fontFamily = settings.fontFamily;
@@ -1051,3 +1090,4 @@
     </script>
 </body>
 </html>
+
