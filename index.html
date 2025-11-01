@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1a1a1a">
+    <title>ELOHIMS Quote Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { width: 100%; overflow-x: hidden; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+            min-height: 100vh;
+            padding: 5px;
+        }
+        .container {
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        header {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #d4af37;
+            padding: 15px;
+            text-align: center;
+        }
+        header h1 {
+            font-size: clamp(1.3em, 5vw, 2.5em);
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+        }
+        header p {
+            color: #fff;
+            font-size: clamp(0.7em, 2vw, 0.9em);
+            opacity: 0.8;
+        }
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            padding: 10px;
+        }
+        @media (min-width: 1024px) {
+            .main-content {
+                grid-template-columns: 360px 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+        }
+        .upload-section {
+            background: #fafafa;
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px dashed #d4af37;
+            height: fit-content;
+            width: 100%;
+        }
+        .section-title {
+            font-size: clamp(0.9em, 3vw, 1.1em);
+            color: #1a1a1a;
+            margin-bottom: 10px;
+            font-weight: 600;
+            border-bottom: 2px solid #d4af37;
+            padding-bottom: 5px;
+        }
+        .upload-box {
+            background: white;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 18px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 10px;
+            min-height: 90px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .upload-box:hover, .upload-box:active {
+            border-color: #d4af37;
+            background: #fffef8;
+        }
+        .upload-box.has-image {
+            border-color: #4caf50;
+            background: #f1f8f4;
+        }
+        .upload-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            pointer-events: none;
+        }
+        .upload-preview {
+            max-width: 100%;
+            max-height: 80px;
+            border-radius: 4px;
+            display: none;
+            margin-top: 8px;
+        }
+        .upload-preview.visible { display: block; }
+        input[type="file"] { display: none; }
+        
+        .quotes-input {
+            width: 100%;
+            min-height: 80px;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.85em;
+            resize: vertical;
+            margin-bottom: 8px;
+        }
+        .quotes-input:focus {
+            outline: none;
+            border-color: #d4af37;
+        }
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+            margin-bottom: 8px;
+            width: 100%;
+        }
+        .preset-templates {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5px;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        .quick-btn, .preset-btn {
+            padding: 8px 4px;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.7em;
+            font-weight: 500;
+            transition: all 0.3s;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+        }
+        .quick-btn:hover, .preset-btn:hover,
+        .quick-btn:active, .preset-btn:active {
+            border-color: #d4af37;
+            background: #fffef8;
+        }
+        .controls-section { margin-top: 10px; }
+        .control-group { margin-bottom: 8px; }
+        .control-group label {
+            display: block;
+            margin-bottom: 4px;
+            color: #333;
+            font-weight: 500;
+            font-size: 0.75em;
+        }
+        .control-group select {
+            width: 100%;
+            padding: 6px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.8em;
+        }
+        .control-group input[type="range"] {
+            width: 100%;
+            padding: 0;
+            height: 24px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: transparent;
+            cursor: pointer;
+        }
+        .control-group input[type="range"]::-webkit-slider-track {
+            width: 100%;
+            height: 6px;
+            background: #ddd;
+            border-radius: 3px;
+        }
+        .control-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #d4af37;
+            border-radius: 50%;
+            cursor: pointer;
+            margin-top: -7px;
+        }
+        .control-group input[type="color"] {
+            width: 100%;
+            height: 35px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            padding: 2px;
+        }
+        .align-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+        }
+        .align-btn {
+            padding: 6px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            font-size: 0.75em;
+        }
+        .align-btn:hover, .align-btn:active { border-color: #d4af37; }
+        .align-btn.active {
+            background: #d4af37;
+            color: white;
+            border-color: #d4af37;
+        }
+        .preview-section {
+            background: #fafafa;
+            padding: 12px;
+            border-radius: 8px;
+        }
+        .canvas-wrapper {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            margin-bottom: 10px;
+        }
+        .canvas-container {
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            background: #000;
+        }
+        .export-canvas {
+            width: 1080px;
+            height: 1080px;
+            position: relative;
+            background: #f0f0f0;
+            transform-origin: top left;
+        }
+        .canvas-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .quote-box {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.95);
+            border: 3px solid #8B0000;
+            border-radius: 25px;
+            padding: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .quote-text {
+            font-size: 42px;
+            line-height: 1.6;
+            color: #1a1a1a;
+            font-weight: 600;
+            word-wrap: break-word;
+            max-width: 100%;
+        }
+        .placeholder-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 0.9em;
+            background: rgba(255,255,255,0.9);
+            z-index: 10;
+            text-align: center;
+            padding: 20px;
+            gap: 15px;
+        }
+        .placeholder-logo {
+            width: 120px;
+            height: 120px;
+            opacity: 0.3;
+            margin-bottom: 10px;
+        }
+        .upload-placeholder-logo {
+            width: 60px;
+            height: 60px;
+            opacity: 0.4;
+            margin-bottom: 8px;
+        }
+        .preview-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            background: white;
+            border-top: 2px solid #f0f0f0;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .nav-btn {
+            padding: 6px 12px;
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            font-size: 0.8em;
+        }
+        .nav-btn:hover, .nav-btn:active { background: #d4af37; }
+        .nav-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .quote-counter {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.8em;
+        }
+        .export-section { padding: 0 12px 12px 12px; }
+        .export-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .option-group {
+            background: #fafafa;
+            padding: 8px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+        .option-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-size: 0.75em;
+            color: #333;
+        }
+        .option-group select {
+            width: 100%;
+            padding: 6px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.8em;
+        }
+        .export-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #d4af37 0%, #c9a12c 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+        .export-btn:hover, .export-btn:active {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+        }
+        .export-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .export-btn.loading { background: #666; }
+        .status-message {
+            text-align: center;
+            margin-top: 8px;
+            padding: 8px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.75em;
+            display: none;
+        }
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+        .status-message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            display: block;
+        }
+        .collapsible-section {
+            border-top: 1px solid #e0e0e0;
+            padding-top: 8px;
+            margin-top: 8px;
+        }
+        .collapsible-header {
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            background: #f5f5f5;
+            padding: 8px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .collapsible-content.open { max-height: 2000px; }
+        .toggle-icon {
+            transition: transform 0.3s;
+            font-size: 1em;
+            color: #d4af37;
+            font-weight: bold;
+        }
+        .toggle-icon.open { transform: rotate(180deg); }
+        .reset-btn {
+            padding: 8px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75em;
+            font-weight: 500;
+            transition: all 0.3s;
+            margin-top: 8px;
+            width: 100%;
+        }
+        .reset-btn:hover, .reset-btn:active { background: #ff5252; }
+        
+        @media (max-width: 640px) {
+            body { padding: 5px; }
+            .container { border-radius: 8px; }
+            header { padding: 10px; }
+            .main-content { padding: 8px; gap: 8px; }
+            .upload-section, .preview-section { padding: 10px; }
+            .export-section { padding: 0 8px 8px 8px; }
+            .collapsible-content { max-height: 0; }
+            .section-title { font-size: 0.85em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ELOHIMS</h1>
+            <p>Quote Generator — Professional Background-Based Formatter</p>
+        </header>
+
+        <div class="main-content">
+            <div class="left-panel">
+                <div class="upload-section">
+                    <h2 class="section-title">📁 Upload & Input</h2>
+                    
+                    <div class="upload-box" id="uploadBox">
+                        <input type="file" id="bgInput" accept="image/*">
+                        <div class="upload-content" id="uploadContent">
+                            <img id="uploadLogoImg" alt="ELOHIMS Logo" class="upload-placeholder-logo">
+                            <p style="font-weight: 600; margin-bottom: 3px; font-size: 0.85em;">Click to Upload Background</p>
+                            <p style="font-size: 0.7em; color: #666;">PNG or JPG</p>
+                        </div>
+                        <img id="uploadPreview" class="upload-preview">
+                    </div>
+
+                    <label for="quotesInput" style="font-weight: 600; margin-bottom: 5px; display: block; font-size: 0.8em;">Enter Quotes (one per line):</label>
+                    <textarea id="quotesInput" class="quotes-input" placeholder="Faith moves mountains&#10;Trust builds bridges&#10;God's grace is sufficient"></textarea>
+
+                    <div class="quick-actions">
+                        <button class="quick-btn" id="clearBtn">🗑️ Clear All</button>
+                        <button class="quick-btn" id="sampleBtn">✨ Sample</button>
+                    </div>
+
+                    <div class="preset-templates">
+                        <button class="preset-btn" data-preset="elegant">🎨 Elegant</button>
+                        <button class="preset-btn" data-preset="bold">💪 Bold</button>
+                        <button class="preset-btn" data-preset="minimal">⚪ Minimal</button>
+                        <button class="preset-btn" data-preset="vibrant">🌈 Vibrant</button>
+                    </div>
+
+                    <div class="controls-section">
+                        <div class="collapsible-section">
+                            <div class="collapsible-header" onclick="toggleSection('boxControls')">
+                                <h3 class="section-title" style="margin: 0; border: none; padding: 0; font-size: 0.85em;">🎨 Box Style</h3>
+                                <span class="toggle-icon" id="boxControlsIcon">▼</span>
+                            </div>
+                            <div class="collapsible-content" id="boxControls">
+                                <div class="control-group">
+                                    <label>Width: <span id="boxWidthValue">70%</span></label>
+                                    <input type="range" id="boxWidth" min="50" max="90" value="70">
+                                </div>
+                                <div class="control-group">
+                                    <label>Height: <span id="boxHeightValue">35%</span></label>
+                                    <input type="range" id="boxHeight" min="25" max="50" value="35">
+                                </div>
+                                <div class="control-group">
+                                    <label>Horizontal: <span id="boxHPosValue">50%</span></label>
+                                    <input type="range" id="boxHPos" min="0" max="100" value="50">
+                                </div>
+                                <div class="control-group">
+                                    <label>Vertical: <span id="boxVPosValue">50%</span></label>
+                                    <input type="range" id="boxVPos" min="0" max="100" value="50">
+                                </div>
+                                <div class="control-group">
+                                    <label>Box Color</label>
+                                    <input type="color" id="boxBgColor" value="#ffffff">
+                                </div>
+                                <div class="control-group">
+                                    <label>Opacity: <span id="boxOpacityValue">95%</span></label>
+                                    <input type="range" id="boxOpacity" min="50" max="100" value="95">
+                                </div>
+                                <div class="control-group">
+                                    <label>Border Color</label>
+                                    <input type="color" id="borderColor" value="#8B0000">
+                                </div>
+                                <div class="control-group">
+                                    <label>Border: <span id="borderWidthValue">3px</span></label>
+                                    <input type="range" id="borderWidth" min="0" max="10" value="3">
+                                </div>
+                                <div class="control-group">
+                                    <label>Corners: <span id="cornerRadiusValue">25px</span></label>
+                                    <input type="range" id="cornerRadius" min="0" max="50" value="25">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="collapsible-section">
+                            <div class="collapsible-header" onclick="toggleSection('textControls')">
+                                <h3 class="section-title" style="margin: 0; border: none; padding: 0; font-size: 0.85em;">✍️ Text Style</h3>
+                                <span class="toggle-icon" id="textControlsIcon">▼</span>
+                            </div>
+                            <div class="collapsible-content" id="textControls">
+                                <div class="control-group">
+                                    <label>Font Family</label>
+                                    <select id="fontFamily">
+                                        <option value="Arial, sans-serif">Arial</option>
+                                        <option value="'Times New Roman', serif">Times New Roman</option>
+                                        <option value="Georgia, serif">Georgia</option>
+                                        <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+                                        <option value="Verdana, sans-serif">Verdana</option>
+                                        <option value="'Impact', sans-serif">Impact</option>
+                                        <option value="'Comic Sans MS', cursive">Comic Sans</option>
+                                        <option value="'Courier New', monospace">Courier New</option>
+                                    </select>
+                                </div>
+                                <div class="control-group">
+                                    <label>Size: <span id="fontSizeValue">42px</span></label>
+                                    <input type="range" id="fontSize" min="24" max="72" value="42">
+                                </div>
+                                <div class="control-group">
+                                    <label>Font Color</label>
+                                    <input type="color" id="fontColor" value="#1a1a1a">
+                                </div>
+                                <div class="control-group">
+                                    <label>Weight: <span id="fontWeightValue">600</span></label>
+                                    <input type="range" id="fontWeight" min="300" max="900" step="100" value="600">
+                                </div>
+                                <div class="control-group">
+                                    <label>Line Height: <span id="lineHeightValue">1.6</span></label>
+                                    <input type="range" id="lineHeight" min="1" max="2.5" step="0.1" value="1.6">
+                                </div>
+                                <div class="control-group">
+                                    <label>Alignment</label>
+                                    <div class="align-buttons">
+                                        <button class="align-btn" data-align="left">Left</button>
+                                        <button class="align-btn active" data-align="center">Center</button>
+                                        <button class="align-btn" data-align="right">Right</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="reset-btn" id="resetBtn">🔄 Reset All Settings</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-panel">
+                <div class="preview-section">
+                    <h2 class="section-title">👁️ Live Preview</h2>
+                    
+                    <div class="canvas-wrapper">
+                        <div class="canvas-container" id="canvasContainer">
+                            <div class="export-canvas" id="exportCanvas">
+                                <img id="canvasBg" class="canvas-background" style="display: none;">
+                                <div id="quoteBoxContainer">
+                                    <div class="quote-box" id="quoteBox">
+                                        <div class="quote-text" id="quoteText"></div>
+                                    </div>
+                                </div>
+                                <div class="placeholder-overlay" id="placeholderOverlay">
+                                    <img id="placeholderLogoImg" alt="ELOHIMS Logo" class="placeholder-logo">
+                                    <div>
+                                        <p style="font-weight: 600; margin-bottom: 5px;">Upload Background & Enter Quotes</p>
+                                        <p style="font-size: 0.85em;">Get started by adding your image and quotes above</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="preview-controls">
+                            <button class="nav-btn" id="prevBtn" disabled>← Prev</button>
+                            <div class="quote-counter" id="quoteCounter">No quotes</div>
+                            <button class="nav-btn" id="nextBtn" disabled>Next →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="export-section">
+            <div class="export-options">
+                <div class="option-group">
+                    <label>Format</label>
+                    <select id="exportFormat">
+                        <option value="png">PNG (Best Quality)</option>
+                        <option value="jpeg">JPEG (Smaller)</option>
+                    </select>
+                </div>
+                <div class="option-group">
+                    <label>Size</label>
+                    <select id="exportSize">
+                        <option value="1080">1080x1080 (Instagram)</option>
+                        <option value="1200">1200x1200 (High Res)</option>
+                        <option value="800">800x800 (Web)</option>
+                    </select>
+                </div>
+            </div>
+            <button class="export-btn" id="exportBtn" disabled>📦 Generate & Download ZIP</button>
+            <div class="status-message" id="statusMessage"></div>
+        </div>
+    </div>
+
+    <script>
+        // Set logo images on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            // You can replace this with the actual logo URL: 'logo.png' or full URL
+            const logoSrc = 'logo.png'; // Change this to your logo path
+            document.getElementById('uploadLogoImg').src = logoSrc;
+            document.getElementById('placeholderLogoImg').src = logoSrc;
+        });
+        
+        function toggleSection(id) {
+            const content = document.getElementById(id);
+            const icon = document.getElementById(id + 'Icon');
+            content.classList.toggle('open');
+            icon.classList.toggle('open');
+        }
+
+        let backgroundImage = null, quotes = [], currentQuoteIndex = 0;
+        
+        const defaultSettings = {
+            boxWidth: 70, boxHeight: 35, boxHPos: 50, boxVPos: 50,
+            boxBgColor: '#ffffff', boxOpacity: 95, borderColor: '#8B0000',
+            borderWidth: 3, cornerRadius: 25, fontFamily: 'Arial, sans-serif',
+            fontSize: 42, fontColor: '#1a1a1a', fontWeight: 600, lineHeight: 1.6, textAlign: 'center'
+        };
+
+        let settings = {...defaultSettings};
+
+        const presets = {
+            elegant: {boxBgColor: '#ffffff', boxOpacity: 90, borderColor: '#d4af37', borderWidth: 2, cornerRadius: 30, fontFamily: 'Georgia, serif', fontSize: 38, fontColor: '#2c3e50', fontWeight: 400, lineHeight: 1.8},
+            bold: {boxBgColor: '#1a1a1a', boxOpacity: 95, borderColor: '#ff4444', borderWidth: 6, cornerRadius: 10, fontFamily: "'Impact', sans-serif", fontSize: 48, fontColor: '#ffffff', fontWeight: 700, lineHeight: 1.4},
+            minimal: {boxBgColor: '#f8f9fa', boxOpacity: 85, borderColor: '#e9ecef', borderWidth: 1, cornerRadius: 5, fontFamily: 'Arial, sans-serif', fontSize: 36, fontColor: '#495057', fontWeight: 400, lineHeight: 1.7},
+            vibrant: {boxBgColor: '#ff6b6b', boxOpacity: 90, borderColor: '#4ecdc4', borderWidth: 5, cornerRadius: 20, fontFamily: "'Trebuchet MS', sans-serif", fontSize: 44, fontColor: '#ffffff', fontWeight: 700, lineHeight: 1.5}
+        };
+
+        const $ = id => document.getElementById(id);
+
+        function scaleCanvas() {
+            const w = $('canvasContainer').offsetWidth;
+            const scale = w / 1080;
+            $('exportCanvas').style.transform = `scale(${scale})`;
+            $('canvasContainer').style.height = (1080 * scale) + 'px';
+        }
+
+        window.addEventListener('resize', scaleCanvas);
+        setTimeout(scaleCanvas, 100);
+
+        $('uploadBox').onclick = () => $('bgInput').click();
+        
+        $('bgInput').onchange = e => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    backgroundImage = e.target.result;
+                    $('uploadPreview').src = backgroundImage;
+                    $('uploadPreview').classList.add('visible');
+                    $('uploadContent').style.display = 'none';
+                    $('uploadBox').classList.add('has-image');
+                    $('canvasBg').src = backgroundImage;
+                    $('canvasBg').style.display = 'block';
+                    updatePreview();
+                    updateExportButton();
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        $('quotesInput').oninput = () => {
+            quotes = $('quotesInput').value.trim().split('\n').filter(q => q.trim());
+            currentQuoteIndex = 0;
+            updateNavigation();
+            updatePreview();
+            updateExportButton();
+        };
+
+        $('clearBtn').onclick = () => {
+            $('quotesInput').value = '';
+            quotes = [];
+            currentQuoteIndex = 0;
+            updateNavigation();
+            updatePreview();
+            updateExportButton();
+        };
+
+        $('sampleBtn').onclick = () => {
+            $('quotesInput').value = 'Faith moves mountains\nTrust builds bridges\nGod\'s grace is sufficient\nEvery challenge is growth\nLet your light shine';
+            $('quotesInput').oninput();
+        };
+
+        $('resetBtn').onclick = () => {
+            settings = {...defaultSettings};
+            applySettings();
+            updatePreview();
+        };
+
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.onclick = () => {
+                Object.assign(settings, presets[btn.dataset.preset]);
+                applySettings();
+                updatePreview();
+            };
+        });
+
+        function applySettings() {
+            $('boxWidth').value = settings.boxWidth;
+            $('boxWidthValue').textContent = settings.boxWidth + '%';
+            $('boxHeight').value = settings.boxHeight;
+            $('boxHeightValue').textContent = settings.boxHeight + '%';
+            $('boxHPos').value = settings.boxHPos;
+            $('boxHPosValue').textContent = settings.boxHPos + '%';
+            $('boxVPos').value = settings.boxVPos;
+            $('boxVPosValue').textContent = settings.boxVPos + '%';
+            $('boxBgColor').value = settings.boxBgColor;
+            $('boxOpacity').value = settings.boxOpacity;
+            $('boxOpacityValue').textContent = settings.boxOpacity + '%';
+            $('borderColor').value = settings.borderColor;
+            $('borderWidth').value = settings.borderWidth;
+            $('borderWidthValue').textContent = settings.borderWidth + 'px';
+            $('cornerRadius').value = settings.cornerRadius;
+            $('cornerRadiusValue').textContent = settings.cornerRadius + 'px';
+            $('fontFamily').value = settings.fontFamily;
+            $('fontSize').value = settings.fontSize;
+            $('fontSizeValue').textContent = settings.fontSize + 'px';
+            $('fontColor').value = settings.fontColor;
+            $('fontWeight').value = settings.fontWeight;
+            $('fontWeightValue').textContent = settings.fontWeight;
+            $('lineHeight').value = settings.lineHeight;
+            $('lineHeightValue').textContent = settings.lineHeight;
+            document.querySelectorAll('.align-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.align === settings.textAlign);
+            });
+        }
+
+        $('boxWidth').oninput = e => {
+            settings.boxWidth = e.target.value;
+            $('boxWidthValue').textContent = e.target.value + '%';
+            updatePreview();
+        };
+
+        $('boxHeight').oninput = e => {
+            settings.boxHeight = e.target.value;
+            $('boxHeightValue').textContent = e.target.value + '%';
+            updatePreview();
+        };
+
+        $('boxHPos').oninput = e => {
+            settings.boxHPos = e.target.value;
+            $('boxHPosValue').textContent = e.target.value + '%';
+            updatePreview();
+        };
+
+        $('boxVPos').oninput = e => {
+            settings.boxVPos = e.target.value;
+            $('boxVPosValue').textContent = e.target.value + '%';
+            updatePreview();
+        };
+
+        $('boxBgColor').oninput = e => {
+            settings.boxBgColor = e.target.value;
+            updatePreview();
+        };
+
+        $('boxOpacity').oninput = e => {
+            settings.boxOpacity = e.target.value;
+            $('boxOpacityValue').textContent = e.target.value + '%';
+            updatePreview();
+        };
+
+        $('borderColor').oninput = e => {
+            settings.borderColor = e.target.value;
+            updatePreview();
+        };
+
+        $('borderWidth').oninput = e => {
+            settings.borderWidth = e.target.value;
+            $('borderWidthValue').textContent = e.target.value + 'px';
+            updatePreview();
+        };
+
+        $('cornerRadius').oninput = e => {
+            settings.cornerRadius = e.target.value;
+            $('cornerRadiusValue').textContent = e.target.value + 'px';
+            updatePreview();
+        };
+
+        $('fontFamily').onchange = e => {
+            settings.fontFamily = e.target.value;
+            updatePreview();
+        };
+
+        $('fontSize').oninput = e => {
+            settings.fontSize = e.target.value;
+            $('fontSizeValue').textContent = e.target.value + 'px';
+            updatePreview();
+        };
+
+        $('fontColor').oninput = e => {
+            settings.fontColor = e.target.value;
+            updatePreview();
+        };
+
+        $('fontWeight').oninput = e => {
+            settings.fontWeight = e.target.value;
+            $('fontWeightValue').textContent = e.target.value;
+            updatePreview();
+        };
+
+        $('lineHeight').oninput = e => {
+            settings.lineHeight = e.target.value;
+            $('lineHeightValue').textContent = e.target.value;
+            updatePreview();
+        };
+
+        document.querySelectorAll('.align-btn').forEach(btn => {
+            btn.onclick = e => {
+                document.querySelectorAll('.align-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                settings.textAlign = e.target.dataset.align;
+                updatePreview();
+            };
+        });
+
+        $('prevBtn').onclick = () => {
+            if (currentQuoteIndex > 0) {
+                currentQuoteIndex--;
+                updateNavigation();
+                updatePreview();
+            }
+        };
+
+        $('nextBtn').onclick = () => {
+            if (currentQuoteIndex < quotes.length - 1) {
+                currentQuoteIndex++;
+                updateNavigation();
+                updatePreview();
+            }
+        };
+
+        function updateNavigation() {
+            if (quotes.length === 0) {
+                $('quoteCounter').textContent = 'No quotes';
+                $('prevBtn').disabled = true;
+                $('nextBtn').disabled = true;
+            } else {
+                $('quoteCounter').textContent = `${currentQuoteIndex + 1}/${quotes.length}`;
+                $('prevBtn').disabled = currentQuoteIndex === 0;
+                $('nextBtn').disabled = currentQuoteIndex === quotes.length - 1;
+            }
+        }
+
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : { r: 255, g: 255, b: 255 };
+        }
+
+        function updatePreview() {
+            if (quotes.length === 0 || !backgroundImage) {
+                $('placeholderOverlay').style.display = 'flex';
+                return;
+            }
+
+            $('placeholderOverlay').style.display = 'none';
+            
+            const quote = quotes[currentQuoteIndex];
+            $('quoteText').textContent = quote;
+            
+            const rgb = hexToRgb(settings.boxBgColor);
+            const opacity = settings.boxOpacity / 100;
+            
+            const box = $('quoteBox');
+            box.style.width = settings.boxWidth + '%';
+            box.style.height = settings.boxHeight + '%';
+            box.style.left = settings.boxHPos + '%';
+            box.style.top = settings.boxVPos + '%';
+            box.style.transform = 'translate(-50%, -50%)';
+            box.style.background = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity})`;
+            box.style.border = `${settings.borderWidth}px solid ${settings.borderColor}`;
+            box.style.borderRadius = settings.cornerRadius + 'px';
+            
+            const text = $('quoteText');
+            text.style.fontFamily = settings.fontFamily;
+            text.style.fontSize = settings.fontSize + 'px';
+            text.style.color = settings.fontColor;
+            text.style.fontWeight = settings.fontWeight;
+            text.style.lineHeight = settings.lineHeight;
+            text.style.textAlign = settings.textAlign;
+        }
+
+        function updateExportButton() {
+            $('exportBtn').disabled = !backgroundImage || quotes.length === 0;
+        }
+
+        $('exportBtn').onclick = async () => {
+            if (!backgroundImage || quotes.length === 0) return;
+
+            const btn = $('exportBtn');
+            
+            btn.disabled = true;
+            btn.textContent = '⏳ Generating...';
+            btn.classList.add('loading');
+            showStatus('Generating quote images...', 'info');
+
+            try {
+                const zip = new JSZip();
+                const format = $('exportFormat').value;
+                const size = parseInt($('exportSize').value);
+                const scale = size / 1080;
+                
+                for (let i = 0; i < quotes.length; i++) {
+                    currentQuoteIndex = i;
+                    updatePreview();
+                    
+                    await new Promise(resolve => setTimeout(resolve, 150));
+                    
+                    const canvas = await html2canvas($('exportCanvas'), {
+                        backgroundColor: null,
+                        scale: scale * 2,
+                        logging: false,
+                        width: 1080,
+                        height: 1080
+                    });
+                    
+                    const mimeType = format === 'png' ? 'image/png' : 'image/jpeg';
+                    const quality = format === 'jpeg' ? 0.92 : undefined;
+                    
+                    const blob = await new Promise(resolve => {
+                        if (format === 'jpeg') {
+                            canvas.toBlob(resolve, mimeType, quality);
+                        } else {
+                            canvas.toBlob(resolve, mimeType);
+                        }
+                    });
+                    
+                    const ext = format === 'png' ? 'png' : 'jpg';
+                    zip.file(`quote-${i + 1}.${ext}`, blob);
+                    
+                    showStatus(`Generated ${i + 1} of ${quotes.length}...`, 'info');
+                }
+                
+                showStatus('Creating ZIP file...', 'info');
+                const zipBlob = await zip.generateAsync({type: 'blob'});
+                
+                saveAs(zipBlob, 'elohims-quotes.zip');
+                
+                showStatus(`✅ Successfully generated ${quotes.length} quotes!`, 'success');
+                
+                currentQuoteIndex = 0;
+                updateNavigation();
+                updatePreview();
+                
+            } catch (error) {
+                console.error('Export error:', error);
+                showStatus('❌ Error generating quotes. Please try again.', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '📦 Generate & Download ZIP';
+                btn.classList.remove('loading');
+            }
+        };
+
+        function showStatus(message, type) {
+            const msg = $('statusMessage');
+            msg.textContent = message;
+            msg.className = 'status-message ' + type;
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    msg.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        updateNavigation();
+        updateExportButton();
+    </script>
+</body>
+</html>
