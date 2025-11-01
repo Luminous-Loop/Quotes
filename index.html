@@ -459,11 +459,12 @@
 </head>
 <body>
     <div class="container">
-       <header>
+        <header>
             <img id="headerLogo" src="logo.png" alt="ELOHIMS" class="header-logo" onerror="this.style.display='none'; document.getElementById('headerTitle').style.display='block';">
             <h1 id="headerTitle" style="display: none;">ELOHIMS</h1>
             <p>Quote Generator — Mobile Edition</p>
         </header>
+
         <div class="install-prompt" id="installPrompt">
             📱 Tap here to install app for offline use
         </div>
@@ -508,7 +509,7 @@
                             <div class="quote-box" id="quoteBox">
                                 <div class="quote-text" id="quoteText"></div>
                             </div>
-                         <div class="placeholder-overlay" id="placeholderOverlay">
+                            <div class="placeholder-overlay" id="placeholderOverlay">
                                 <img id="placeholderLogoImg" alt="ELOHIMS Logo" style="width: 100px; height: 100px; opacity: 0.3; margin-bottom: 10px;">
                                 <p style="font-weight: 600; margin-bottom: 8px; font-size: 1.1em;">📸 Upload & Create</p>
                                 <p style="font-size: 0.9em;">Add background and quotes to start</p>
@@ -523,7 +524,7 @@
                 </div>
             </div>
 
-           <div class="section">
+            <div class="section">
                 <div class="collapsible-header" onclick="toggleSection('boxControls')">
                     <h3 class="section-title" style="margin: 0; border: none; padding: 0;">🎨 Box Style</h3>
                     <span class="toggle-icon" id="boxControlsIcon">▼</span>
@@ -536,6 +537,14 @@
                     <div class="control-group">
                         <label>Height: <span id="boxHeightValue">35%</span></label>
                         <input type="range" id="boxHeight" min="25" max="50" value="35">
+                    </div>
+                    <div class="control-group">
+                        <label>Horizontal: <span id="boxHPosValue">50%</span></label>
+                        <input type="range" id="boxHPos" min="0" max="100" value="50">
+                    </div>
+                    <div class="control-group">
+                        <label>Vertical: <span id="boxVPosValue">50%</span></label>
+                        <input type="range" id="boxVPos" min="0" max="100" value="50">
                     </div>
                     <div class="control-group">
                         <label>Box Color</label>
@@ -553,21 +562,12 @@
                         <label>Border: <span id="borderWidthValue">3px</span></label>
                         <input type="range" id="borderWidth" min="0" max="10" value="3">
                     </div>
-                  <div class="control-group">
+                    <div class="control-group">
                         <label>Corners: <span id="cornerRadiusValue">25px</span></label>
                         <input type="range" id="cornerRadius" min="0" max="50" value="25">
                     </div>
-                    <div class="control-group">
-                        <label>Horizontal: <span id="boxHPosValue">50%</span></label>
-                        <input type="range" id="boxHPos" min="0" max="100" value="50">
-                    </div>
-                    <div class="control-group">
-                        <label>Vertical: <span id="boxVPosValue">50%</span></label>
-                        <input type="range" id="boxVPos" min="0" max="100" value="50">
-                    </div>
                 </div>
             </div>
-          
 
             <div class="section">
                 <div class="collapsible-header" onclick="toggleSection('textControls')">
@@ -648,6 +648,7 @@
             if (uploadLogo) uploadLogo.src = logoSrc;
             if (placeholderLogo) placeholderLogo.src = logoSrc;
         });
+
         // PWA Service Worker Registration
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -819,14 +820,14 @@
         });
 
         function applySettings() {
-            $('boxHPos').value = settings.boxHPos;
-            $('boxHPosValue').textContent = settings.boxHPos + '%';
-            $('boxVPos').value = settings.boxVPos;
-            $('boxVPosValue').textContent = settings.boxVPos + '%';
             $('boxWidth').value = settings.boxWidth;
             $('boxWidthValue').textContent = settings.boxWidth + '%';
             $('boxHeight').value = settings.boxHeight;
             $('boxHeightValue').textContent = settings.boxHeight + '%';
+            $('boxHPos').value = settings.boxHPos;
+            $('boxHPosValue').textContent = settings.boxHPos + '%';
+            $('boxVPos').value = settings.boxVPos;
+            $('boxVPosValue').textContent = settings.boxVPos + '%';
             $('boxBgColor').value = settings.boxBgColor;
             $('boxOpacity').value = settings.boxOpacity;
             $('boxOpacityValue').textContent = settings.boxOpacity + '%';
@@ -869,7 +870,7 @@
             $('boxVPosValue').textContent = e.target.value + '%';
             updatePreview();
         };
-        
+
         $('boxBgColor').oninput = e => {
             settings.boxBgColor = e.target.value;
             updatePreview();
@@ -983,14 +984,12 @@
             const box = $('quoteBox');
             box.style.width = settings.boxWidth + '%';
             box.style.height = settings.boxHeight + '%';
-            box.style.left = '50%';
-            box.style.top = '50%';
+            box.style.left = settings.boxHPos + '%';
+            box.style.top = settings.boxVPos + '%';
             box.style.transform = 'translate(-50%, -50%)';
             box.style.background = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity})`;
             box.style.border = `${settings.borderWidth}px solid ${settings.borderColor}`;
             box.style.borderRadius = settings.cornerRadius + 'px';
-            box.style.left = settings.boxHPos + '%';
-            box.style.top = settings.boxVPos + '%';
             
             const text = $('quoteText');
             text.style.fontFamily = settings.fontFamily;
@@ -1019,20 +1018,30 @@
                 const zip = new JSZip();
                 const format = $('exportFormat').value;
                 const size = parseInt($('exportSize').value);
-                const scale = size / 1080;
+                
+                // Store original transform
+                const originalTransform = $('exportCanvas').style.transform;
+                
+                // Reset transform for export to ensure proper rendering
+                $('exportCanvas').style.transform = 'scale(1)';
+                $('canvasContainer').style.height = '1080px';
                 
                 for (let i = 0; i < quotes.length; i++) {
                     currentQuoteIndex = i;
                     updatePreview();
                     
-                    await new Promise(resolve => setTimeout(resolve, 150));
+                    await new Promise(resolve => setTimeout(resolve, 200));
                     
                     const canvas = await html2canvas($('exportCanvas'), {
                         backgroundColor: null,
-                        scale: scale * 2,
+                        scale: size / 1080,
                         logging: false,
                         width: 1080,
-                        height: 1080
+                        height: 1080,
+                        windowWidth: 1080,
+                        windowHeight: 1080,
+                        x: 0,
+                        y: 0
                     });
                     
                     const mimeType = format === 'png' ? 'image/png' : 'image/jpeg';
@@ -1052,6 +1061,10 @@
                     showStatus(`Generated ${i + 1} of ${quotes.length}...`, 'info');
                 }
                 
+                // Restore transform after export
+                $('exportCanvas').style.transform = originalTransform;
+                scaleCanvas();
+                
                 showStatus('Creating ZIP file...', 'info');
                 const zipBlob = await zip.generateAsync({type: 'blob'});
                 
@@ -1066,6 +1079,9 @@
             } catch (error) {
                 console.error('Export error:', error);
                 showStatus('❌ Error generating quotes. Please try again.', 'error');
+                
+                // Restore transform on error
+                scaleCanvas();
             } finally {
                 btn.disabled = false;
                 btn.textContent = '📦 Generate & Download';
@@ -1090,4 +1106,3 @@
     </script>
 </body>
 </html>
-
