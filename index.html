@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#1a1a1a">
-    <meta name="description" content="Professional quote generator with customizable backgrounds">
+    <meta name="description" content="Professional quote generator with advanced styling">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="ELOHIMS">
+    <meta name="apple-mobile-web-app-title" content="ELOHIMS Pro">
     <link rel="manifest" href="#" id="manifest-placeholder">
-    <title>ELOHIMS Quote Generator</title>
+    <title>ELOHIMS Quote Generator Pro</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
@@ -45,13 +45,7 @@
             padding: 12px;
             text-align: center;
             flex-shrink: 0;
-        }
-        .header-logo {
-            max-width: 180px;
-            height: auto;
-            max-height: 60px;
-            margin: 0 auto 6px;
-            display: block;
+            position: relative;
         }
         header h1 {
             font-size: 1.5em;
@@ -63,6 +57,17 @@
             color: #fff;
             font-size: 0.75em;
             opacity: 0.8;
+        }
+        .version-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #d4af37;
+            color: #1a1a1a;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            font-weight: 700;
         }
         .install-prompt {
             background: #d4af37;
@@ -143,6 +148,26 @@
             outline: none;
             border-color: #d4af37;
         }
+        .attribution-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95em;
+            margin-bottom: 10px;
+        }
+        .attribution-input:focus {
+            outline: none;
+            border-color: #d4af37;
+        }
+        .help-text {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: -5px;
+            margin-bottom: 10px;
+            padding: 0 5px;
+        }
         .quick-actions {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -203,11 +228,10 @@
         }
         .quote-box {
             position: absolute;
-            background: rgba(255, 255, 255, 0.95);
-            border: 3px solid #8B0000;
             border-radius: 25px;
             padding: 50px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
@@ -217,6 +241,17 @@
             line-height: 1.6;
             color: #1a1a1a;
             font-weight: 600;
+            word-wrap: break-word;
+            max-width: 100%;
+            margin-bottom: 0;
+        }
+        .quote-attribution {
+            font-size: 28px;
+            line-height: 1.4;
+            color: #555;
+            font-weight: 400;
+            font-style: italic;
+            margin-top: 25px;
             word-wrap: break-word;
             max-width: 100%;
         }
@@ -287,7 +322,7 @@
             overflow: hidden;
             transition: max-height 0.3s ease;
         }
-        .collapsible-content.open { max-height: 2000px; }
+        .collapsible-content.open { max-height: 3000px; }
         .toggle-icon {
             transition: transform 0.3s;
             font-size: 1.2em;
@@ -341,6 +376,28 @@
             border-radius: 8px;
             cursor: pointer;
         }
+        .control-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            margin-right: 8px;
+        }
+        .control-group input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.9em;
+        }
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .checkbox-wrapper label {
+            margin-bottom: 0;
+            cursor: pointer;
+        }
         .align-buttons {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -364,6 +421,11 @@
             background: #d4af37;
             color: white;
             border-color: #d4af37;
+        }
+        .color-pair {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
         }
         .export-options {
             display: grid;
@@ -438,9 +500,8 @@
             color: #0c5460;
             display: block;
         }
-        .reset-btn {
+        .action-btn {
             padding: 12px;
-            background: #ff6b6b;
             color: white;
             border: none;
             border-radius: 8px;
@@ -451,18 +512,50 @@
             margin-top: 10px;
             width: 100%;
         }
-        .reset-btn:active { 
-            background: #ff5252;
+        .action-btn.reset { background: #ff6b6b; }
+        .action-btn.save { background: #4caf50; }
+        .action-btn.load { background: #2196f3; }
+        .action-btn:active { 
             transform: scale(0.98);
+            filter: brightness(0.9);
+        }
+        .preset-manager {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .history-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .history-btn {
+            padding: 10px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .history-btn:active {
+            transform: scale(0.98);
+            background: #5a6268;
+        }
+        .history-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <img id="headerLogo" src="logo.png" alt="ELOHIMS" class="header-logo" onerror="this.style.display='none'; document.getElementById('headerTitle').style.display='block';">
-            <h1 id="headerTitle" style="display: none;">ELOHIMS</h1>
-            <p>Quote Generator — Mobile Edition</p>
+            <span class="version-badge">PRO v3</span>
+            <h1>ELOHIMS</h1>
+            <p>Professional Quote Generator</p>
         </header>
 
         <div class="install-prompt" id="installPrompt">
@@ -471,21 +564,26 @@
 
         <div class="main-content">
             <div class="section">
-                <h2 class="section-title">📁 Upload Background</h2>
+                <h2 class="section-title">📷 Upload Background</h2>
                 <div class="upload-box" id="uploadBox">
                     <input type="file" id="bgInput" accept="image/*">
                     <div class="upload-content" id="uploadContent">
-                        <img id="uploadLogoImg" alt="ELOHIMS Logo" style="width: 50px; height: 50px; opacity: 0.4; margin-bottom: 8px;">
                         <p style="font-weight: 600; margin-bottom: 5px;">Tap to Upload Background</p>
-                        <p style="font-size: 0.8em; color: #666;">PNG or JPG</p>
+                        <p style="font-size: 0.8em; color: #666;">PNG or JPG recommended</p>
                     </div>
                     <img id="uploadPreview" class="upload-preview">
                 </div>
             </div>
 
             <div class="section">
-                <h2 class="section-title">✍️ Enter Quotes</h2>
+                <h2 class="section-title">✏️ Enter Quotes</h2>
                 <textarea id="quotesInput" class="quotes-input" placeholder="Faith moves mountains&#10;Trust builds bridges&#10;God's grace is sufficient"></textarea>
+                
+                <label for="attributionInput" style="display: block; margin-bottom: 6px; color: #333; font-weight: 600; font-size: 0.9em;">
+                    👤 Quote Attribution (Optional)
+                </label>
+                <input type="text" id="attributionInput" class="attribution-input" placeholder="e.g., Pastor John, Apostle Paul, Anonymous">
+                <p class="help-text">💡 Leave blank for no attribution, or add author name to appear below each quote</p>
                 
                 <div class="quick-actions">
                     <button class="btn" id="clearBtn">🗑️ Clear</button>
@@ -508,9 +606,9 @@
                             <img id="canvasBg" class="canvas-background" style="display: none;">
                             <div class="quote-box" id="quoteBox">
                                 <div class="quote-text" id="quoteText"></div>
+                                <div class="quote-attribution" id="quoteAttr" style="display: none;"></div>
                             </div>
                             <div class="placeholder-overlay" id="placeholderOverlay">
-                                <img id="placeholderLogoImg" alt="ELOHIMS Logo" style="width: 100px; height: 100px; opacity: 0.3; margin-bottom: 10px;">
                                 <p style="font-weight: 600; margin-bottom: 8px; font-size: 1.1em;">📸 Upload & Create</p>
                                 <p style="font-size: 0.9em;">Add background and quotes to start</p>
                             </div>
@@ -520,6 +618,36 @@
                         <button class="nav-btn" id="prevBtn" disabled>← Prev</button>
                         <div class="quote-counter" id="quoteCounter">No quotes</div>
                         <button class="nav-btn" id="nextBtn" disabled>Next →</button>
+                    </div>
+                </div>
+                
+                <div class="history-controls">
+                    <button class="history-btn" id="undoBtn" disabled>↶ Undo</button>
+                    <button class="history-btn" id="redoBtn" disabled>↷ Redo</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="collapsible-header" onclick="toggleSection('bgControls')">
+                    <h3 class="section-title" style="margin: 0; border: none; padding: 0;">🖼️ Background Effects</h3>
+                    <span class="toggle-icon" id="bgControlsIcon">▼</span>
+                </div>
+                <div class="collapsible-content" id="bgControls">
+                    <div class="control-group">
+                        <label>Blur: <span id="bgBlurValue">0px</span></label>
+                        <input type="range" id="bgBlur" min="0" max="20" value="0">
+                    </div>
+                    <div class="control-group">
+                        <label>Brightness: <span id="bgBrightnessValue">100%</span></label>
+                        <input type="range" id="bgBrightness" min="50" max="150" value="100">
+                    </div>
+                    <div class="control-group">
+                        <label>Contrast: <span id="bgContrastValue">100%</span></label>
+                        <input type="range" id="bgContrast" min="50" max="150" value="100">
+                    </div>
+                    <div class="control-group">
+                        <label>Saturation: <span id="bgSaturationValue">100%</span></label>
+                        <input type="range" id="bgSaturation" min="0" max="200" value="100">
                     </div>
                 </div>
             </div>
@@ -536,81 +664,118 @@
                     </div>
                     <div class="control-group">
                         <label>Height: <span id="boxHeightValue">35%</span></label>
-                        <input type="range" id="boxHeight" min="25" max="50" value="35">
+                        <input type="range" id="boxHeight" min="25" max="60" value="35">
                     </div>
                     <div class="control-group">
-                        <label>Horizontal: <span id="boxHPosValue">50%</span></label>
-                        <input type="range" id="boxHPos" min="0" max="100" value="50">
+                        <label>Padding: <span id="boxPaddingValue">50px</span></label>
+                        <input type="range" id="boxPadding" min="20" max="80" value="50">
                     </div>
-                    <div class="control-group">
-                        <label>Vertical: <span id="boxVPosValue">50%</span></label>
-                        <input type="range" id="boxVPos" min="0" max="100" value="50">
+                    
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="enableTextShadow">
+                        <label for="enableTextShadow">Enable Text Shadow</label>
                     </div>
-                    <div class="control-group">
-                        <label>Box Color</label>
-                        <input type="color" id="boxBgColor" value="#ffffff">
+                    <div id="shadowControls" style="display: none;">
+                        <div class="control-group">
+                            <label>Shadow Color</label>
+                            <input type="color" id="textShadowColor" value="#000000">
+                        </div>
+                        <div class="control-group">
+                            <label>Shadow Blur: <span id="shadowBlurValue">4px</span></label>
+                            <input type="range" id="shadowBlur" min="0" max="20" value="4">
+                        </div>
+                        <div class="control-group">
+                            <label>Shadow X: <span id="shadowXValue">2px</span></label>
+                            <input type="range" id="shadowX" min="-10" max="10" value="2">
+                        </div>
+                        <div class="control-group">
+                            <label>Shadow Y: <span id="shadowYValue">2px</span></label>
+                            <input type="range" id="shadowY" min="-10" max="10" value="2">
+                        </div>
                     </div>
-                    <div class="control-group">
-                        <label>Opacity: <span id="boxOpacityValue">95%</span></label>
-                        <input type="range" id="boxOpacity" min="50" max="100" value="95">
+                    
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="enableTextStroke">
+                        <label for="enableTextStroke">Enable Text Outline</label>
                     </div>
-                    <div class="control-group">
-                        <label>Border Color</label>
-                        <input type="color" id="borderColor" value="#8B0000">
-                    </div>
-                    <div class="control-group">
-                        <label>Border: <span id="borderWidthValue">3px</span></label>
-                        <input type="range" id="borderWidth" min="0" max="10" value="3">
-                    </div>
-                    <div class="control-group">
-                        <label>Corners: <span id="cornerRadiusValue">25px</span></label>
-                        <input type="range" id="cornerRadius" min="0" max="50" value="25">
-                    </div>
-                </div>
-            </div>
-
-            <div class="section">
-                <div class="collapsible-header" onclick="toggleSection('textControls')">
-                    <h3 class="section-title" style="margin: 0; border: none; padding: 0;">✍️ Text Style</h3>
-                    <span class="toggle-icon" id="textControlsIcon">▼</span>
-                </div>
-                <div class="collapsible-content" id="textControls">
-                    <div class="control-group">
-                        <label>Font</label>
-                        <select id="fontFamily">
-                            <option value="Arial, sans-serif">Arial</option>
-                            <option value="'Times New Roman', serif">Times New Roman</option>
-                            <option value="Georgia, serif">Georgia</option>
-                            <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
-                            <option value="Verdana, sans-serif">Verdana</option>
-                            <option value="'Impact', sans-serif">Impact</option>
-                        </select>
-                    </div>
-                    <div class="control-group">
-                        <label>Size: <span id="fontSizeValue">42px</span></label>
-                        <input type="range" id="fontSize" min="24" max="72" value="42">
-                    </div>
-                    <div class="control-group">
-                        <label>Color</label>
-                        <input type="color" id="fontColor" value="#1a1a1a">
-                    </div>
-                    <div class="control-group">
-                        <label>Weight: <span id="fontWeightValue">600</span></label>
-                        <input type="range" id="fontWeight" min="300" max="900" step="100" value="600">
-                    </div>
-                    <div class="control-group">
-                        <label>Alignment</label>
-                        <div class="align-buttons">
-                            <button class="align-btn" data-align="left">Left</button>
-                            <button class="align-btn active" data-align="center">Center</button>
-                            <button class="align-btn" data-align="right">Right</button>
+                    <div id="strokeControls" style="display: none;">
+                        <div class="control-group">
+                            <label>Outline Color</label>
+                            <input type="color" id="textStrokeColor" value="#ffffff">
+                        </div>
+                        <div class="control-group">
+                            <label>Outline Width: <span id="strokeWidthValue">2px</span></label>
+                            <input type="range" id="strokeWidth" min="1" max="5" value="2">
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="section">
-                <button class="reset-btn" id="resetBtn">🔄 Reset Settings</button>
+                <div class="collapsible-header" onclick="toggleSection('attrControls')">
+                    <h3 class="section-title" style="margin: 0; border: none; padding: 0;">👤 Attribution Style</h3>
+                    <span class="toggle-icon" id="attrControlsIcon">▼</span>
+                </div>
+                <div class="collapsible-content" id="attrControls">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="showAttribution" checked>
+                        <label for="showAttribution">Show Attribution</label>
+                    </div>
+                    <div class="control-group">
+                        <label>Font</label>
+                        <select id="attrFontFamily">
+                            <option value="Arial, sans-serif">Arial</option>
+                            <option value="'Times New Roman', serif">Times New Roman</option>
+                            <option value="Georgia, serif">Georgia</option>
+                            <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+                            <option value="Verdana, sans-serif">Verdana</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Size: <span id="attrFontSizeValue">28px</span></label>
+                        <input type="range" id="attrFontSize" min="18" max="48" value="28">
+                    </div>
+                    <div class="control-group">
+                        <label>Color</label>
+                        <input type="color" id="attrFontColor" value="#555555">
+                    </div>
+                    <div class="control-group">
+                        <label>Weight: <span id="attrFontWeightValue">400</span></label>
+                        <input type="range" id="attrFontWeight" min="300" max="900" step="100" value="400">
+                    </div>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="attrItalic" checked>
+                        <label for="attrItalic">Italic Style</label>
+                    </div>
+                    <div class="control-group">
+                        <label>Prefix</label>
+                        <select id="attrPrefix">
+                            <option value="—">— (em dash)</option>
+                            <option value="-">- (dash)</option>
+                            <option value="~">~ (tilde)</option>
+                            <option value="">None</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">💾 Preset Manager</h2>
+                <div class="control-group">
+                    <label>Preset Name</label>
+                    <input type="text" id="presetName" placeholder="Enter preset name...">
+                </div>
+                <div class="preset-manager">
+                    <button class="action-btn save" id="savePresetBtn">💾 Save Preset</button>
+                    <button class="action-btn load" id="loadPresetBtn">📂 Load Preset</button>
+                </div>
+                <button class="action-btn" style="background: #ff9800;" id="exportSettingsBtn">📤 Export Settings</button>
+                <button class="action-btn" style="background: #9c27b0;" id="importSettingsBtn">📥 Import Settings</button>
+                <input type="file" id="settingsFileInput" accept=".json" style="display: none;">
+            </div>
+
+            <div class="section">
+                <button class="action-btn reset" id="resetBtn">🔄 Reset All Settings</button>
             </div>
 
             <div class="section">
@@ -639,48 +804,26 @@
     </div>
 
     <script>
-        // Set logo images on page load
-        window.addEventListener('DOMContentLoaded', () => {
-            const logoSrc = 'logo.png';
-            const uploadLogo = document.getElementById('uploadLogoImg');
-            const placeholderLogo = document.getElementById('placeholderLogoImg');
-            
-            if (uploadLogo) uploadLogo.src = logoSrc;
-            if (placeholderLogo) placeholderLogo.src = logoSrc;
-        });
-
-        // PWA Service Worker Registration
+        // PWA Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 const swCode = `
-                    const CACHE_NAME = 'elohims-v1';
+                    const CACHE_NAME = 'elohims-v3';
                     const urlsToCache = ['/'];
-                    
                     self.addEventListener('install', event => {
-                        event.waitUntil(
-                            caches.open(CACHE_NAME)
-                                .then(cache => cache.addAll(urlsToCache))
-                        );
+                        event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache)));
                     });
-                    
                     self.addEventListener('fetch', event => {
-                        event.respondWith(
-                            caches.match(event.request)
-                                .then(response => response || fetch(event.request))
-                        );
+                        event.respondWith(caches.match(event.request).then(response => response || fetch(event.request)));
                     });
                 `;
-                
                 const blob = new Blob([swCode], { type: 'application/javascript' });
                 const swUrl = URL.createObjectURL(blob);
-                
-                navigator.serviceWorker.register(swUrl)
-                    .then(reg => console.log('SW registered'))
-                    .catch(err => console.log('SW registration failed'));
+                navigator.serviceWorker.register(swUrl).catch(err => console.log('SW failed'));
             });
         }
 
-        // PWA Install Prompt
+        // PWA Install
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
@@ -691,7 +834,7 @@
         document.getElementById('installPrompt').addEventListener('click', async () => {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
+                await deferredPrompt.userChoice;
                 deferredPrompt = null;
                 document.getElementById('installPrompt').classList.remove('show');
             }
@@ -699,30 +842,20 @@
 
         // Manifest
         const manifestData = {
-            name: 'ELOHIMS Quote Generator',
-            short_name: 'ELOHIMS',
-            description: 'Professional quote generator',
+            name: 'ELOHIMS Quote Generator Pro',
+            short_name: 'ELOHIMS Pro',
+            description: 'Professional quote generator with advanced styling',
             start_url: '.',
             display: 'standalone',
             background_color: '#1a1a1a',
             theme_color: '#1a1a1a',
             icons: [
-                {
-                    src: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect fill="%231a1a1a" width="192" height="192"/><text x="96" y="120" font-size="80" text-anchor="middle" fill="%23d4af37" font-weight="bold">E</text></svg>',
-                    sizes: '192x192',
-                    type: 'image/svg+xml'
-                },
-                {
-                    src: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect fill="%231a1a1a" width="512" height="512"/><text x="256" y="320" font-size="200" text-anchor="middle" fill="%23d4af37" font-weight="bold">E</text></svg>',
-                    sizes: '512x512',
-                    type: 'image/svg+xml'
-                }
+                {src: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect fill="%231a1a1a" width="192" height="192"/><text x="96" y="120" font-size="80" text-anchor="middle" fill="%23d4af37" font-weight="bold">E</text></svg>', sizes: '192x192', type: 'image/svg+xml'},
+                {src: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect fill="%231a1a1a" width="512" height="512"/><text x="256" y="320" font-size="200" text-anchor="middle" fill="%23d4af37" font-weight="bold">E</text></svg>', sizes: '512x512', type: 'image/svg+xml'}
             ]
         };
-        
         const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
-        const manifestURL = URL.createObjectURL(manifestBlob);
-        document.getElementById('manifest-placeholder').href = manifestURL;
+        document.getElementById('manifest-placeholder').href = URL.createObjectURL(manifestBlob);
 
         function toggleSection(id) {
             const content = document.getElementById(id);
@@ -731,26 +864,67 @@
             icon.classList.toggle('open');
         }
 
-        let backgroundImage = null, quotes = [], currentQuoteIndex = 0;
+        let backgroundImage = null, quotes = [], currentQuoteIndex = 0, attribution = '';
+        let history = [], historyIndex = -1;
         
         const defaultSettings = {
-            boxWidth: 70, boxHeight: 35, boxHPos: 50, boxVPos: 50,
-            boxBgColor: '#ffffff', boxOpacity: 95,
+            boxWidth: 70, boxHeight: 35, boxPadding: 50, boxBgColor: '#ffffff', boxOpacity: 95,
+            useGradient: false, boxGradientColor: '#f0f0f0', gradientAngle: 135,
             borderColor: '#8B0000', borderWidth: 3, cornerRadius: 25,
             fontFamily: 'Arial, sans-serif', fontSize: 42, fontColor: '#1a1a1a',
-            fontWeight: 600, lineHeight: 1.6, textAlign: 'center'
+            fontWeight: 600, lineHeight: 1.6, letterSpacing: 0, textAlign: 'center',
+            enableTextShadow: false, textShadowColor: '#000000', shadowBlur: 4, shadowX: 2, shadowY: 2,
+            enableTextStroke: false, textStrokeColor: '#ffffff', strokeWidth: 2,
+            showAttribution: true,
+            attrFontFamily: 'Arial, sans-serif', attrFontSize: 28, attrFontColor: '#555555',
+            attrFontWeight: 400, attrItalic: true, attrPrefix: '—',
+            bgBlur: 0, bgBrightness: 100, bgContrast: 100, bgSaturation: 100
         };
 
         let settings = {...defaultSettings};
 
         const presets = {
-            elegant: {boxBgColor: '#ffffff', boxOpacity: 90, borderColor: '#d4af37', borderWidth: 2, cornerRadius: 30, fontFamily: 'Georgia, serif', fontSize: 38, fontColor: '#2c3e50', fontWeight: 400, lineHeight: 1.8},
-            bold: {boxBgColor: '#1a1a1a', boxOpacity: 95, borderColor: '#ff4444', borderWidth: 6, cornerRadius: 10, fontFamily: "'Impact', sans-serif", fontSize: 48, fontColor: '#ffffff', fontWeight: 700, lineHeight: 1.4},
-            minimal: {boxBgColor: '#f8f9fa', boxOpacity: 85, borderColor: '#e9ecef', borderWidth: 1, cornerRadius: 5, fontFamily: 'Arial, sans-serif', fontSize: 36, fontColor: '#495057', fontWeight: 400, lineHeight: 1.7},
-            vibrant: {boxBgColor: '#ff6b6b', boxOpacity: 90, borderColor: '#4ecdc4', borderWidth: 5, cornerRadius: 20, fontFamily: "'Trebuchet MS', sans-serif", fontSize: 44, fontColor: '#ffffff', fontWeight: 700, lineHeight: 1.5}
+            elegant: {boxBgColor: '#ffffff', boxOpacity: 90, borderColor: '#d4af37', borderWidth: 2, cornerRadius: 30, fontFamily: 'Georgia, serif', fontSize: 38, fontColor: '#2c3e50', fontWeight: 400, lineHeight: 1.8, attrFontFamily: 'Georgia, serif', attrFontSize: 26, attrFontColor: '#7f8c8d', attrFontWeight: 300},
+            bold: {boxBgColor: '#1a1a1a', boxOpacity: 95, borderColor: '#ff4444', borderWidth: 6, cornerRadius: 10, fontFamily: "'Impact', sans-serif", fontSize: 48, fontColor: '#ffffff', fontWeight: 700, lineHeight: 1.4, attrFontFamily: 'Arial, sans-serif', attrFontSize: 30, attrFontColor: '#cccccc', attrFontWeight: 600},
+            minimal: {boxBgColor: '#f8f9fa', boxOpacity: 85, borderColor: '#e9ecef', borderWidth: 1, cornerRadius: 5, fontFamily: 'Arial, sans-serif', fontSize: 36, fontColor: '#495057', fontWeight: 400, lineHeight: 1.7, attrFontFamily: 'Arial, sans-serif', attrFontSize: 24, attrFontColor: '#6c757d', attrFontWeight: 300},
+            vibrant: {boxBgColor: '#ff6b6b', boxOpacity: 90, borderColor: '#4ecdc4', borderWidth: 5, cornerRadius: 20, fontFamily: "'Trebuchet MS', sans-serif", fontSize: 44, fontColor: '#ffffff', fontWeight: 700, lineHeight: 1.5, attrFontFamily: "'Trebuchet MS', sans-serif", attrFontSize: 28, attrFontColor: '#ffe66d', attrFontWeight: 600}
         };
 
         const $ = id => document.getElementById(id);
+
+        function saveToHistory() {
+            history = history.slice(0, historyIndex + 1);
+            history.push({...settings});
+            historyIndex++;
+            if (history.length > 50) {
+                history.shift();
+                historyIndex--;
+            }
+            updateHistoryButtons();
+        }
+
+        function updateHistoryButtons() {
+            $('undoBtn').disabled = historyIndex <= 0;
+            $('redoBtn').disabled = historyIndex >= history.length - 1;
+        }
+
+        $('undoBtn').onclick = () => {
+            if (historyIndex > 0) {
+                historyIndex--;
+                settings = {...history[historyIndex]};
+                applySettings();
+                updatePreview();
+            }
+        };
+
+        $('redoBtn').onclick = () => {
+            if (historyIndex < history.length - 1) {
+                historyIndex++;
+                settings = {...history[historyIndex]};
+                applySettings();
+                updatePreview();
+            }
+        };
 
         function scaleCanvas() {
             const w = $('canvasContainer').offsetWidth;
@@ -791,9 +965,16 @@
             updateExportButton();
         };
 
+        $('attributionInput').oninput = () => {
+            attribution = $('attributionInput').value.trim();
+            updatePreview();
+        };
+
         $('clearBtn').onclick = () => {
             $('quotesInput').value = '';
+            $('attributionInput').value = '';
             quotes = [];
+            attribution = '';
             currentQuoteIndex = 0;
             updateNavigation();
             updatePreview();
@@ -802,13 +983,16 @@
 
         $('sampleBtn').onclick = () => {
             $('quotesInput').value = 'Faith moves mountains\nTrust builds bridges\nGod\'s grace is sufficient\nEvery challenge is growth\nLet your light shine';
+            $('attributionInput').value = 'Pastor John';
             $('quotesInput').oninput();
+            $('attributionInput').oninput();
         };
 
         $('resetBtn').onclick = () => {
             settings = {...defaultSettings};
             applySettings();
             updatePreview();
+            saveToHistory();
         };
 
         document.querySelectorAll('.btn[data-preset]').forEach(btn => {
@@ -816,6 +1000,7 @@
                 Object.assign(settings, presets[btn.dataset.preset]);
                 applySettings();
                 updatePreview();
+                saveToHistory();
             };
         });
 
@@ -824,13 +1009,16 @@
             $('boxWidthValue').textContent = settings.boxWidth + '%';
             $('boxHeight').value = settings.boxHeight;
             $('boxHeightValue').textContent = settings.boxHeight + '%';
-            $('boxHPos').value = settings.boxHPos;
-            $('boxHPosValue').textContent = settings.boxHPos + '%';
-            $('boxVPos').value = settings.boxVPos;
-            $('boxVPosValue').textContent = settings.boxVPos + '%';
+            $('boxPadding').value = settings.boxPadding;
+            $('boxPaddingValue').textContent = settings.boxPadding + 'px';
             $('boxBgColor').value = settings.boxBgColor;
             $('boxOpacity').value = settings.boxOpacity;
             $('boxOpacityValue').textContent = settings.boxOpacity + '%';
+            $('useGradient').checked = settings.useGradient;
+            $('boxGradientColor').value = settings.boxGradientColor;
+            $('gradientAngle').value = settings.gradientAngle;
+            $('gradientAngleValue').textContent = settings.gradientAngle + '°';
+            $('gradientControls').style.display = settings.useGradient ? 'block' : 'none';
             $('borderColor').value = settings.borderColor;
             $('borderWidth').value = settings.borderWidth;
             $('borderWidthValue').textContent = settings.borderWidth + 'px';
@@ -842,94 +1030,311 @@
             $('fontColor').value = settings.fontColor;
             $('fontWeight').value = settings.fontWeight;
             $('fontWeightValue').textContent = settings.fontWeight;
+            $('lineHeight').value = settings.lineHeight;
+            $('lineHeightValue').textContent = settings.lineHeight;
+            $('letterSpacing').value = settings.letterSpacing;
+            $('letterSpacingValue').textContent = settings.letterSpacing + 'px';
+            $('enableTextShadow').checked = settings.enableTextShadow;
+            $('shadowControls').style.display = settings.enableTextShadow ? 'block' : 'none';
+            $('textShadowColor').value = settings.textShadowColor;
+            $('shadowBlur').value = settings.shadowBlur;
+            $('shadowBlurValue').textContent = settings.shadowBlur + 'px';
+            $('shadowX').value = settings.shadowX;
+            $('shadowXValue').textContent = settings.shadowX + 'px';
+            $('shadowY').value = settings.shadowY;
+            $('shadowYValue').textContent = settings.shadowY + 'px';
+            $('enableTextStroke').checked = settings.enableTextStroke;
+            $('strokeControls').style.display = settings.enableTextStroke ? 'block' : 'none';
+            $('textStrokeColor').value = settings.textStrokeColor;
+            $('strokeWidth').value = settings.strokeWidth;
+            $('strokeWidthValue').textContent = settings.strokeWidth + 'px';
+            $('showAttribution').checked = settings.showAttribution;
+            $('attrFontFamily').value = settings.attrFontFamily;
+            $('attrFontSize').value = settings.attrFontSize;
+            $('attrFontSizeValue').textContent = settings.attrFontSize + 'px';
+            $('attrFontColor').value = settings.attrFontColor;
+            $('attrFontWeight').value = settings.attrFontWeight;
+            $('attrFontWeightValue').textContent = settings.attrFontWeight;
+            $('attrItalic').checked = settings.attrItalic;
+            $('attrPrefix').value = settings.attrPrefix;
+            $('bgBlur').value = settings.bgBlur;
+            $('bgBlurValue').textContent = settings.bgBlur + 'px';
+            $('bgBrightness').value = settings.bgBrightness;
+            $('bgBrightnessValue').textContent = settings.bgBrightness + '%';
+            $('bgContrast').value = settings.bgContrast;
+            $('bgContrastValue').textContent = settings.bgContrast + '%';
+            $('bgSaturation').value = settings.bgSaturation;
+            $('bgSaturationValue').textContent = settings.bgSaturation + '%';
+            
             document.querySelectorAll('.align-btn').forEach(b => {
                 b.classList.toggle('active', b.dataset.align === settings.textAlign);
             });
         }
 
+        // Background Effects
+        $('bgBlur').oninput = e => {
+            settings.bgBlur = e.target.value;
+            $('bgBlurValue').textContent = e.target.value + 'px';
+            updatePreview();
+        };
+        $('bgBrightness').oninput = e => {
+            settings.bgBrightness = e.target.value;
+            $('bgBrightnessValue').textContent = e.target.value + '%';
+            updatePreview();
+        };
+        $('bgContrast').oninput = e => {
+            settings.bgContrast = e.target.value;
+            $('bgContrastValue').textContent = e.target.value + '%';
+            updatePreview();
+        };
+        $('bgSaturation').oninput = e => {
+            settings.bgSaturation = e.target.value;
+            $('bgSaturationValue').textContent = e.target.value + '%';
+            updatePreview();
+        };
+
+        // Box Controls
         $('boxWidth').oninput = e => {
             settings.boxWidth = e.target.value;
             $('boxWidthValue').textContent = e.target.value + '%';
             updatePreview();
         };
-
         $('boxHeight').oninput = e => {
             settings.boxHeight = e.target.value;
             $('boxHeightValue').textContent = e.target.value + '%';
             updatePreview();
         };
-
-        $('boxHPos').oninput = e => {
-            settings.boxHPos = e.target.value;
-            $('boxHPosValue').textContent = e.target.value + '%';
+        $('boxPadding').oninput = e => {
+            settings.boxPadding = e.target.value;
+            $('boxPaddingValue').textContent = e.target.value + 'px';
             updatePreview();
         };
-
-        $('boxVPos').oninput = e => {
-            settings.boxVPos = e.target.value;
-            $('boxVPosValue').textContent = e.target.value + '%';
-            updatePreview();
-        };
-
         $('boxBgColor').oninput = e => {
             settings.boxBgColor = e.target.value;
             updatePreview();
         };
-
         $('boxOpacity').oninput = e => {
             settings.boxOpacity = e.target.value;
             $('boxOpacityValue').textContent = e.target.value + '%';
             updatePreview();
         };
-
+        $('useGradient').onchange = e => {
+            settings.useGradient = e.target.checked;
+            $('gradientControls').style.display = e.target.checked ? 'block' : 'none';
+            updatePreview();
+            saveToHistory();
+        };
+        $('boxGradientColor').oninput = e => {
+            settings.boxGradientColor = e.target.value;
+            updatePreview();
+        };
+        $('gradientAngle').oninput = e => {
+            settings.gradientAngle = e.target.value;
+            $('gradientAngleValue').textContent = e.target.value + '°';
+            updatePreview();
+        };
         $('borderColor').oninput = e => {
             settings.borderColor = e.target.value;
             updatePreview();
         };
-
         $('borderWidth').oninput = e => {
             settings.borderWidth = e.target.value;
             $('borderWidthValue').textContent = e.target.value + 'px';
             updatePreview();
         };
-
         $('cornerRadius').oninput = e => {
             settings.cornerRadius = e.target.value;
             $('cornerRadiusValue').textContent = e.target.value + 'px';
             updatePreview();
         };
 
+        // Text Controls
         $('fontFamily').onchange = e => {
             settings.fontFamily = e.target.value;
             updatePreview();
+            saveToHistory();
         };
-
         $('fontSize').oninput = e => {
             settings.fontSize = e.target.value;
             $('fontSizeValue').textContent = e.target.value + 'px';
             updatePreview();
         };
-
         $('fontColor').oninput = e => {
             settings.fontColor = e.target.value;
             updatePreview();
         };
-
         $('fontWeight').oninput = e => {
             settings.fontWeight = e.target.value;
             $('fontWeightValue').textContent = e.target.value;
             updatePreview();
         };
-
+        $('lineHeight').oninput = e => {
+            settings.lineHeight = e.target.value;
+            $('lineHeightValue').textContent = e.target.value;
+            updatePreview();
+        };
+        $('letterSpacing').oninput = e => {
+            settings.letterSpacing = e.target.value;
+            $('letterSpacingValue').textContent = e.target.value + 'px';
+            updatePreview();
+        };
         document.querySelectorAll('.align-btn').forEach(btn => {
             btn.onclick = e => {
                 document.querySelectorAll('.align-btn').forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
                 settings.textAlign = e.target.dataset.align;
                 updatePreview();
+                saveToHistory();
             };
         });
 
+        // Text Effects
+        $('enableTextShadow').onchange = e => {
+            settings.enableTextShadow = e.target.checked;
+            $('shadowControls').style.display = e.target.checked ? 'block' : 'none';
+            updatePreview();
+            saveToHistory();
+        };
+        $('textShadowColor').oninput = e => {
+            settings.textShadowColor = e.target.value;
+            updatePreview();
+        };
+        $('shadowBlur').oninput = e => {
+            settings.shadowBlur = e.target.value;
+            $('shadowBlurValue').textContent = e.target.value + 'px';
+            updatePreview();
+        };
+        $('shadowX').oninput = e => {
+            settings.shadowX = e.target.value;
+            $('shadowXValue').textContent = e.target.value + 'px';
+            updatePreview();
+        };
+        $('shadowY').oninput = e => {
+            settings.shadowY = e.target.value;
+            $('shadowYValue').textContent = e.target.value + 'px';
+            updatePreview();
+        };
+        $('enableTextStroke').onchange = e => {
+            settings.enableTextStroke = e.target.checked;
+            $('strokeControls').style.display = e.target.checked ? 'block' : 'none';
+            updatePreview();
+            saveToHistory();
+        };
+        $('textStrokeColor').oninput = e => {
+            settings.textStrokeColor = e.target.value;
+            updatePreview();
+        };
+        $('strokeWidth').oninput = e => {
+            settings.strokeWidth = e.target.value;
+            $('strokeWidthValue').textContent = e.target.value + 'px';
+            updatePreview();
+        };
+
+        // Attribution Controls
+        $('showAttribution').onchange = e => {
+            settings.showAttribution = e.target.checked;
+            updatePreview();
+            saveToHistory();
+        };
+        $('attrFontFamily').onchange = e => {
+            settings.attrFontFamily = e.target.value;
+            updatePreview();
+            saveToHistory();
+        };
+        $('attrFontSize').oninput = e => {
+            settings.attrFontSize = e.target.value;
+            $('attrFontSizeValue').textContent = e.target.value + 'px';
+            updatePreview();
+        };
+        $('attrFontColor').oninput = e => {
+            settings.attrFontColor = e.target.value;
+            updatePreview();
+        };
+        $('attrFontWeight').oninput = e => {
+            settings.attrFontWeight = e.target.value;
+            $('attrFontWeightValue').textContent = e.target.value;
+            updatePreview();
+        };
+        $('attrItalic').onchange = e => {
+            settings.attrItalic = e.target.checked;
+            updatePreview();
+            saveToHistory();
+        };
+        $('attrPrefix').onchange = e => {
+            settings.attrPrefix = e.target.value;
+            updatePreview();
+            saveToHistory();
+        };
+
+        // Preset Manager
+        $('savePresetBtn').onclick = () => {
+            const name = $('presetName').value.trim();
+            if (!name) {
+                alert('Please enter a preset name');
+                return;
+            }
+            const presets = JSON.parse(localStorage.getItem('elohims_presets') || '{}');
+            presets[name] = {...settings};
+            localStorage.setItem('elohims_presets', JSON.stringify(presets));
+            showStatus(`✅ Preset "${name}" saved!`, 'success');
+            $('presetName').value = '';
+        };
+
+        $('loadPresetBtn').onclick = () => {
+            const name = $('presetName').value.trim();
+            if (!name) {
+                alert('Please enter a preset name to load');
+                return;
+            }
+            const presets = JSON.parse(localStorage.getItem('elohims_presets') || '{}');
+            if (!presets[name]) {
+                showStatus(`❌ Preset "${name}" not found`, 'error');
+                return;
+            }
+            settings = {...presets[name]};
+            applySettings();
+            updatePreview();
+            saveToHistory();
+            showStatus(`✅ Preset "${name}" loaded!`, 'success');
+        };
+
+        $('exportSettingsBtn').onclick = () => {
+            const dataStr = JSON.stringify(settings, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'elohims-settings.json';
+            link.click();
+            URL.revokeObjectURL(url);
+            showStatus('✅ Settings exported!', 'success');
+        };
+
+        $('importSettingsBtn').onclick = () => {
+            $('settingsFileInput').click();
+        };
+
+        $('settingsFileInput').onchange = e => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    try {
+                        const imported = JSON.parse(e.target.result);
+                        settings = {...defaultSettings, ...imported};
+                        applySettings();
+                        updatePreview();
+                        saveToHistory();
+                        showStatus('✅ Settings imported!', 'success');
+                    } catch (err) {
+                        showStatus('❌ Invalid settings file', 'error');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        };
+
+        // Navigation
         $('prevBtn').onclick = () => {
             if (currentQuoteIndex > 0) {
                 currentQuoteIndex--;
@@ -975,8 +1380,22 @@
 
             $('placeholderOverlay').style.display = 'none';
             
+            // Apply background filters
+            const filters = `blur(${settings.bgBlur}px) brightness(${settings.bgBrightness}%) contrast(${settings.bgContrast}%) saturate(${settings.bgSaturation}%)`;
+            $('canvasBg').style.filter = filters;
+            
             const quote = quotes[currentQuoteIndex];
             $('quoteText').textContent = quote;
+            
+            // Update attribution
+            const attrElement = $('quoteAttr');
+            if (attribution && settings.showAttribution) {
+                const prefix = settings.attrPrefix ? settings.attrPrefix + ' ' : '';
+                attrElement.textContent = prefix + attribution;
+                attrElement.style.display = 'block';
+            } else {
+                attrElement.style.display = 'none';
+            }
             
             const rgb = hexToRgb(settings.boxBgColor);
             const opacity = settings.boxOpacity / 100;
@@ -984,10 +1403,18 @@
             const box = $('quoteBox');
             box.style.width = settings.boxWidth + '%';
             box.style.height = settings.boxHeight + '%';
-            box.style.left = settings.boxHPos + '%';
-            box.style.top = settings.boxVPos + '%';
+            box.style.padding = settings.boxPadding + 'px';
+            box.style.left = '50%';
+            box.style.top = '50%';
             box.style.transform = 'translate(-50%, -50%)';
-            box.style.background = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity})`;
+            
+            if (settings.useGradient) {
+                const rgb2 = hexToRgb(settings.boxGradientColor);
+                box.style.background = `linear-gradient(${settings.gradientAngle}deg, rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity}), rgba(${rgb2.r}, ${rgb2.g}, ${rgb2.b}, ${opacity}))`;
+            } else {
+                box.style.background = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity})`;
+            }
+            
             box.style.border = `${settings.borderWidth}px solid ${settings.borderColor}`;
             box.style.borderRadius = settings.cornerRadius + 'px';
             
@@ -997,7 +1424,28 @@
             text.style.color = settings.fontColor;
             text.style.fontWeight = settings.fontWeight;
             text.style.lineHeight = settings.lineHeight;
+            text.style.letterSpacing = settings.letterSpacing + 'px';
             text.style.textAlign = settings.textAlign;
+            
+            // Text effects
+            let textShadow = 'none';
+            if (settings.enableTextShadow) {
+                textShadow = `${settings.shadowX}px ${settings.shadowY}px ${settings.shadowBlur}px ${settings.textShadowColor}`;
+            }
+            text.style.textShadow = textShadow;
+            
+            if (settings.enableTextStroke) {
+                text.style.webkitTextStroke = `${settings.strokeWidth}px ${settings.textStrokeColor}`;
+            } else {
+                text.style.webkitTextStroke = 'none';
+            }
+            
+            // Style attribution
+            attrElement.style.fontFamily = settings.attrFontFamily;
+            attrElement.style.fontSize = settings.attrFontSize + 'px';
+            attrElement.style.color = settings.attrFontColor;
+            attrElement.style.fontWeight = settings.attrFontWeight;
+            attrElement.style.fontStyle = settings.attrItalic ? 'italic' : 'normal';
         }
 
         function updateExportButton() {
@@ -1018,30 +1466,20 @@
                 const zip = new JSZip();
                 const format = $('exportFormat').value;
                 const size = parseInt($('exportSize').value);
-                
-                // Store original transform
-                const originalTransform = $('exportCanvas').style.transform;
-                
-                // Reset transform for export to ensure proper rendering
-                $('exportCanvas').style.transform = 'scale(1)';
-                $('canvasContainer').style.height = '1080px';
+                const scale = size / 1080;
                 
                 for (let i = 0; i < quotes.length; i++) {
                     currentQuoteIndex = i;
                     updatePreview();
                     
-                    await new Promise(resolve => setTimeout(resolve, 200));
+                    await new Promise(resolve => setTimeout(resolve, 150));
                     
                     const canvas = await html2canvas($('exportCanvas'), {
                         backgroundColor: null,
-                        scale: size / 1080,
+                        scale: scale * 2,
                         logging: false,
                         width: 1080,
-                        height: 1080,
-                        windowWidth: 1080,
-                        windowHeight: 1080,
-                        x: 0,
-                        y: 0
+                        height: 1080
                     });
                     
                     const mimeType = format === 'png' ? 'image/png' : 'image/jpeg';
@@ -1061,10 +1499,6 @@
                     showStatus(`Generated ${i + 1} of ${quotes.length}...`, 'info');
                 }
                 
-                // Restore transform after export
-                $('exportCanvas').style.transform = originalTransform;
-                scaleCanvas();
-                
                 showStatus('Creating ZIP file...', 'info');
                 const zipBlob = await zip.generateAsync({type: 'blob'});
                 
@@ -1079,9 +1513,6 @@
             } catch (error) {
                 console.error('Export error:', error);
                 showStatus('❌ Error generating quotes. Please try again.', 'error');
-                
-                // Restore transform on error
-                scaleCanvas();
             } finally {
                 btn.disabled = false;
                 btn.textContent = '📦 Generate & Download';
@@ -1101,8 +1532,12 @@
             }
         }
 
+        // Initialize
         updateNavigation();
         updateExportButton();
+        applySettings();
+        saveToHistory();
     </script>
 </body>
 </html>
+                        
